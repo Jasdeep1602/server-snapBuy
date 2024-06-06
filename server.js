@@ -2,7 +2,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const app = express();
+const cookieParser = require('cookie-parser');
+
 app.use(express.json());
+app.use(cookieParser());
 require('dotenv').config();
 
 const PORT = process.env.PORT || 5000;
@@ -17,7 +20,7 @@ app.listen(PORT, () => {
 
 //routes
 
-app.use('/user', require('./routes/useRouter'));
+app.use('/user', require('./routes/user.route'));
 
 //connect mongodb
 
