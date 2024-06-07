@@ -4,10 +4,11 @@ const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const userCtrl = {
+  // register
+
   register: async (req, res) => {
     try {
       const { name, email, password } = req.body;
-      console.log(req.body, name, email, password, 'bbh');
 
       const user = await users.findOne({ email });
       if (user)
@@ -46,6 +47,8 @@ const userCtrl = {
       return res.status(500).json({ msg: err.message });
     }
   },
+
+  // refresh token
   refreshtoken: async (req, res) => {
     try {
       const rf_token = req.cookies.refreshtoken;
@@ -62,6 +65,54 @@ const userCtrl = {
         res.json({ user, accesstoken });
       });
     } catch (err) {
+      return res.status(500).json({ msg: err.msg });
+    }
+  },
+
+  // login
+  login: async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      const user = await users.findOne({ email });
+
+      if (!user) return res.status(400).json({ msg: 'User does not exist' });
+
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (!isMatch) return res.status(400).json({ msg: 'Incorrect Password' });
+
+      const accesstoken = createAccessToken({ id: user._id });
+      const refreshtoken = createRefreshToken({ id: user._id });
+
+      res.cookie('refreshtoken', refreshtoken, {
+        httpOnly: true,
+        path: '/user/refreshtoken',
+      });
+
+      res.json({ accesstoken });
+    } catch (err) {
+      return res.status(500).json({ msg: err.msg });
+    }
+  },
+
+  //logout
+  logout: async (req, res) => {
+    try {
+      res.clearCookie('refreshtoken', { path: '/user/refreshtoken' });
+      return res.json({ msg: 'logged out' });
+    } catch (err) {
+      return res.status(500).json({ msg: err.msg });
+    }
+  },
+
+  // info user
+  getUser: async (req, res) => {
+    try {
+      const user = await users.findById(req.user.id).select('-password');
+      if (!user) return res.status(400).json({ msg: 'User not found' });
+      res.json(user);
+    } catch {
       return res.status(500).json({ msg: err.msg });
     }
   },
