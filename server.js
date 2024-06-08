@@ -3,9 +3,17 @@ const mongoose = require('mongoose');
 
 const app = express();
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 
 app.use(express.json());
 app.use(cookieParser());
+// Use fileUpload middleware
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: '/tmp/',
+  })
+);
 require('dotenv').config();
 
 const PORT = process.env.PORT || 5000;
@@ -23,6 +31,9 @@ app.listen(PORT, () => {
 app.use('/user', require('./routes/user.route'));
 
 app.use('/api', require('./routes/category.route'));
+app.use('/api', require('./routes/upload.route'));
+
+app.use('/api', require('./routes/product.route'));
 
 //connect mongodb
 
