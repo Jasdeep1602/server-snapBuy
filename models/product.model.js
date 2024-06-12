@@ -22,15 +22,11 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    content: {
-      type: String,
-      required: true,
-    },
     images: {
       type: Object,
       required: true,
     },
-    category: {
+    rating: {
       type: String,
       required: true,
     },
@@ -38,9 +34,17 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    sold: {
-      type: Number,
-      default: 0,
+    gradientFrom: {
+      type: String,
+      required: true,
+    },
+    gradientTo: {
+      type: String,
+      required: true,
+    },
+    shadowColor: {
+      type: String,
+      required: true,
     },
   },
   {

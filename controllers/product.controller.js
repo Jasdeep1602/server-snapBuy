@@ -79,9 +79,11 @@ const productCtrl = {
         title,
         price,
         description,
-        content,
+        rating,
         images,
-        category,
+        gradientFrom,
+        gradientTo,
+        shadowColor,
       } = req.body;
 
       if (!images) return res.status(400).json({ msg: 'No Image Uploaded' });
@@ -91,12 +93,14 @@ const productCtrl = {
 
       const newProduct = new products({
         product_id,
-        title: title.toLowerCase(),
+        title,
         price,
         description,
-        content,
         images,
-        category,
+        gradientFrom,
+        gradientTo,
+        shadowColor,
+        rating,
       });
       await newProduct.save();
       res.json({ msg: 'Created' });
@@ -119,21 +123,25 @@ const productCtrl = {
         title,
         price,
         description,
-        content,
         images,
-        category,
+        gradientFrom,
+        gradientTo,
+        shadowColor,
+        rating,
       } = req.body;
 
       if (!images) return res.status(500).json({ msg: 'no image Uploaded' });
       await products.findOneAndUpdate(
         { _id: req.params.id },
         {
-          title: title.toLowerCase(),
+          title,
           price,
           description,
-          content,
           images,
-          category,
+          gradientFrom,
+          gradientTo,
+          shadowColor,
+          rating,
         }
       );
       res.json({ msg: 'Updated a Product' });
