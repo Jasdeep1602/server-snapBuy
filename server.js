@@ -1,11 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 const app = express();
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 
 app.use(express.json());
+
+// enable cors
+
+app.use(cors());
+
 app.use(cookieParser());
 // Use fileUpload middleware
 app.use(
