@@ -90,7 +90,7 @@ const userCtrl = {
         path: '/user/refreshtoken',
       });
 
-      res.json({ accesstoken });
+      res.json({ accesstoken, refreshtoken });
     } catch (err) {
       return res.status(500).json({ msg: err.msg });
     }
