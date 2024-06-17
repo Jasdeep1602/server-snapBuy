@@ -5,8 +5,10 @@ require('dotenv').config();
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
+const { urlencoded } = require('express');
 
 const app = express();
+app.use(urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 // Use fileUpload middleware
@@ -19,7 +21,12 @@ app.use(
 
 // enable cors
 
-app.use(cors());
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 const PORT = process.env.PORT || 5000;
 

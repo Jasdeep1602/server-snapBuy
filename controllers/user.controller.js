@@ -34,15 +34,15 @@ const userCtrl = {
 
       //create jwt to authenticate
 
-      const accesstoken = createAccessToken({ id: newUser._id });
-      const refreshtoken = createRefreshToken({ id: newUser._id });
+      // const accesstoken = createAccessToken({ id: newUser._id });
+      // const refreshtoken = createRefreshToken({ id: newUser._id });
 
-      res.cookie('refreshtoken', refreshtoken, {
-        httpOnly: true,
-        path: '/user/refreshtoken',
-      });
+      // res.cookie('refreshtoken', refreshtoken, {
+      //   httpOnly: true,
+      //   path: '/user/refreshtoken',
+      // });
 
-      res.json({ accesstoken });
+      res.json({ msg: 'Account Created ' });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
