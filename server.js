@@ -1,17 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
+require('dotenv').config();
+
+const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 const cors = require('cors');
 
 const app = express();
-const cookieParser = require('cookie-parser');
-const fileUpload = require('express-fileupload');
-
 app.use(express.json());
-
-// enable cors
-
-app.use(cors());
-
 app.use(cookieParser());
 // Use fileUpload middleware
 app.use(
@@ -20,7 +16,10 @@ app.use(
     tempFileDir: '/tmp/',
   })
 );
-require('dotenv').config();
+
+// enable cors
+
+app.use(cors());
 
 const PORT = process.env.PORT || 5000;
 
