@@ -10,6 +10,7 @@ router
 
 router
   .route('/products/:id')
+  .get(auth, authAdmin, productCtrl.getProductById)
   .delete(auth, authAdmin, productCtrl.deleteProduct)
   .put(auth, authAdmin, productCtrl.updateProduct);
 
