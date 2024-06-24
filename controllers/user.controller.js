@@ -1,4 +1,5 @@
 const users = require('../models/user.model');
+const products = require('../models/product.model');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
@@ -114,6 +115,184 @@ const userCtrl = {
       res.json(user);
     } catch {
       return res.status(500).json({ msg: err.msg });
+    }
+  },
+
+  addItemToCart: async (req, res) => {
+    try {
+      const {
+        _id,
+        product_id,
+        title,
+        price,
+        description,
+        images,
+        gradientFrom,
+        gradientTo,
+        shadowColor,
+        quantity,
+      } = req.body;
+      const userId = req.user.id;
+
+      // Check if the product exists
+      const product = await products.findById(_id);
+      if (!product) {
+        return res.status(404).json({ msg: 'Product not found' });
+      }
+
+      // Find the user and update the cart
+      const user = await users.findById(userId).select('-password');
+      if (!user) {
+        return res.status(404).json({ msg: 'User not found' });
+      }
+
+      // Check if the product is already in the cart
+      const cartItem = user.cart.find(
+        (item) => item._id.toString() === _id.toString()
+      );
+      if (cartItem) {
+        // If exists, update quantity
+        cartItem.quantity += quantity;
+      } else {
+        // If not exists, add new item to cart
+        user.cart.push({
+          _id,
+          product_id,
+          title,
+          price,
+          description,
+          images,
+          gradientFrom,
+          gradientTo,
+          shadowColor,
+          quantity,
+        });
+      }
+
+      // Mark the modified paths to ensure Mongoose updates them
+      user.markModified('cart');
+
+      // Save the updated user object
+      await user.save();
+
+      res.json({ msg: 'Item added to cart', user });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+
+  // Remove item from cart
+  removeItemFromCart: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+
+      // Find the user and update the cart
+      const user = await users.findById(userId).select('-password');
+      if (!user) {
+        return res.status(404).json({ msg: 'User not found' });
+      }
+
+      // Filter out the product from cart
+      user.cart = user.cart.filter((item) => item._id.toString() !== id);
+
+      // Save the updated user object
+      await user.save();
+
+      res.json({ msg: 'Item removed from cart', user });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+
+  // Increase quantity of item in cart
+  increaseQuantity: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+
+      // Find the user and update the cart
+      const user = await users.findById(userId).select('-password');
+      if (!user) {
+        return res.status(404).json({ msg: 'User not found' });
+      }
+
+      // Find the item in cart and increase quantity
+      const cartItem = user.cart.find((item) => item._id.toString() === id);
+      if (cartItem) {
+        cartItem.quantity++;
+      } else {
+        return res.status(404).json({ msg: 'Item not found in cart' });
+      }
+
+      // Mark the modified paths to ensure Mongoose updates them
+      user.markModified('cart');
+
+      // Save the updated user object
+      await user.save();
+
+      res.json({ msg: 'Quantity increased', user });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+
+  // Decrease quantity of item in cart
+  decreaseQuantity: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+
+      // Find the user and update the cart
+      const user = await users.findById(userId).select('-password');
+      if (!user) {
+        return res.status(404).json({ msg: 'User not found' });
+      }
+
+      // Find the item in cart and decrease quantity
+      const cartItem = user.cart.find((item) => item._id.toString() === id);
+      if (cartItem) {
+        cartItem.quantity--;
+        if (cartItem.quantity <= 0) {
+          // Remove item from cart if quantity is zero or less
+          user.cart = user.cart.filter((item) => item._id.toString() !== id);
+        }
+      } else {
+        return res.status(404).json({ msg: 'Item not found in cart' });
+      }
+
+      // Mark the modified paths to ensure Mongoose updates them
+      user.markModified('cart');
+
+      // Save the updated user object
+      await user.save();
+
+      res.json({ msg: 'Quantity decreased', user });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+
+  // Empty the cart
+  emptyCart: async (req, res) => {
+    try {
+      const userId = req.user.id;
+
+      // Find the user
+      const user = await users.findById(userId).select('-password');
+      if (!user) {
+        return res.status(404).json({ msg: 'User not found' });
+      }
+
+      // Set the cart to an empty array
+      user.cart = [];
+
+      // Save the updated user object
+      await user.save();
+
+      res.json({ msg: 'Cart emptied', user });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
     }
   },
 };
