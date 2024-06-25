@@ -22,7 +22,7 @@ app.use(
 // enable cors
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: 'https://snapbuy-omega.vercel.app/',
   credentials: true,
 };
 
