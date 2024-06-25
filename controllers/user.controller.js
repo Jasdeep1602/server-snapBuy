@@ -90,6 +90,8 @@ const userCtrl = {
       res.cookie('refreshtoken', refreshtoken, {
         httpOnly: true,
         path: '/user/refreshtoken',
+        secure: true, // Ensure this is set if using HTTPS
+        sameSite: 'none', // Adjust according to your requirements
       });
 
       res.json({ accesstoken, refreshtoken });
