@@ -17,4 +17,8 @@ router.put('/increase-quantity/:id', auth, userCtrl.increaseQuantity);
 router.put('/decrease-quantity/:id', auth, userCtrl.decreaseQuantity);
 router.put('/emptycart', auth, userCtrl.emptyCart);
 
+//payment gateway route
+
+router.post('/checkout-session', auth, userCtrl.checkoutSession);
+
 module.exports = router;

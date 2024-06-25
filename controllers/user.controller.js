@@ -2,6 +2,7 @@ const users = require('../models/user.model');
 const products = require('../models/product.model');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const Stripe = require('stripe');
 require('dotenv').config();
 
 const userCtrl = {
@@ -293,6 +294,47 @@ const userCtrl = {
       res.json({ msg: 'Cart emptied', user });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
+    }
+  },
+
+  // payment gateway
+
+  checkoutSession: async (req, res) => {
+    try {
+      const { amount } = req.body;
+      const userId = req.user.id;
+
+      // Find the user
+      const user = await users.findById(userId).select('-password');
+      if (!user) {
+        return res.status(404).json({ msg: 'User not found' });
+      }
+
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+      // create stripe checkour session
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'payment',
+        success_url: `${process.env.CLIENT_SITE_URL}/checkout-success`,
+        cancel_url: `${process.env.CLIENT_SITE_URL}/checkout-failed`,
+        customer_email: user.email,
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: 'SubTotal:',
+              },
+              unit_amount: amount * 100,
+            },
+            quantity: 1,
+          },
+        ],
+      });
+      res.status(200).json({ session, msg: 'Payment Successfull' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   },
 };
